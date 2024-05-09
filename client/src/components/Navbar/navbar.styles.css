@@ -1,0 +1,51 @@
+.nav {
+  position: sticky;
+  display: inline-block;
+  top: 0px;
+  height: 96vh;
+  width: 25vw;
+  max-width: 200px;
+  padding-top: 27px;
+  padding-left: 30px;
+  background-color: white;
+  z-index: 1000;
+}
+
+nav h1 {
+  display: inline;
+  color: rgb(255, 181, 45);
+  font-weight: 600;
+}
+
+.eat {
+  color: rgb(0, 0, 167);
+}
+
+.nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav a {
+  display: block;
+  font-weight: 500;
+  font-size: 13pt;
+  margin-top: 10px;
+  width: 100px;
+  padding: 20px 20px 20px 15px;
+  text-decoration: none;
+  border-radius: 100px;
+}
+
+.nav li.active {
+  background-color: rgb(227, 242, 248);
+  width: fit-content;
+  border-radius: 20px;
+}
+
+@media (max-width: 850px) {
+  .nav {
+    display: none;
+  }
+}

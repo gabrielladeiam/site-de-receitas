@@ -1,0 +1,95 @@
+/*SITE*/
+
+/*SPAN1*/
+
+.span-container {
+  max-width: 800px;
+  background-color: rgb(255, 153, 0);
+  color: white;
+  position: absolute;
+  display: inline-block;
+  margin-left: 5vw;
+  width: 60vw;
+  height: 100px;
+  border-radius: 15px;
+  top: 85px;
+  padding: 15px 10px 0px 0px;
+}
+
+.span-container a {
+  color: white;
+  max-width: 700px;
+  font-size: larger;
+  font-weight: 700;
+  padding-top: 50px;
+  margin: 20px 0px 0px 25px;
+}
+
+.span-container p {
+  max-width: 700px;
+  font-weight: 100;
+  margin: 1ch 0px 0px 25px;
+}
+
+/*SPAN2*/
+
+.recype-tittle-container {
+  max-width: 800px;
+  position: absolute;
+  display: inline-flex;
+  margin-left: 5vw;
+  width: 60vw;
+  top: 200px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.recype-tittle-container h1 {
+  display: inline-block;
+  font-weight: 600;
+  font-size: 18pt;
+}
+
+.recype-tittle-container a {
+  display: inline-block;
+  font-size: smaller;
+  text-decoration: none;
+  color: orange;
+}
+
+/*RECYPE*/
+
+.recype-container {
+  max-width: 800px;
+  position: absolute;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 260px));
+  justify-content: space-evenly;
+  margin-left: 5vw;
+  top: 255px;
+  width: 62vw;
+  height: auto;
+}
+
+.recype-container button {
+  display: none;
+}
+
+@media (max-width: 850px) {
+  body {
+    background-color: #ababab;
+  }
+
+  .span-container {
+    width: 90%;
+  }
+  .recype-tittle-container {
+    width: 90%;
+  }
+
+  .recype-container {
+    width: 88%;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(10px, 215px));
+  }
+}

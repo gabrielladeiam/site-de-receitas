@@ -1,0 +1,16 @@
+.all-recipes-container {
+  position: absolute;
+  margin-left: 2vw;
+  width: 70vw;
+  top: 100px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 260px));
+  justify-content: space-evenly;
+}
+
+@media (max-width: 850px) {
+  .all-recipes-container {
+    width: 81vw;
+    grid-template-columns: repeat(auto-fill, minmax(10px, 215px));
+  }
+}
