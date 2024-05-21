@@ -1,5 +1,6 @@
 import "./ingredients.styles.css";
 import { useState } from "react";
+
 export function Ingredients({
   image,
   imageName,
@@ -12,6 +13,8 @@ export function Ingredients({
 }) {
   const [showInfo, setShowInfo] = useState(false);
 
+  const shouldShowInfo = showInfo && ingredientQuant && ingredientPrice;  
+
   return (
     <span
       style={style}
@@ -21,8 +24,10 @@ export function Ingredients({
     >
       <button onClick={buttonOnClick}></button>
       <img onClick={onClick} src={image} alt={image} />
+
       <h3>{imageName}</h3>
-      {showInfo && ingredientQuant && ingredientPrice && (
+
+      {shouldShowInfo && (
         <div className={`ingredient-info ${showInfo ? "show" : ""}`}>
           <h3>{`R$ ${ingredientPrice}`}</h3>
           <h3>{`${ingredientQuant}Kg`}</h3>
