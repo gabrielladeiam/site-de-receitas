@@ -1,36 +1,20 @@
 import "./recipes.styles.css";
-import { useState, useEffect } from "react";
+import { useEffect, useState,  } from "react";
 import { Ingredients } from "../Ingredients/Ingredients";
+import { useRecipesQuery } from "../../hooks/recipes"
 import { Link } from "react-router-dom";
 import * as icons from "../../assets";
 
 export function Recipes({ totalPrice, searchQuery }) {
+  
+  // TODO - Remove state in favour of useRecipesQuery
   const [recipeList, setRecipeList] = useState();
+  const { data , isLoading}  = useRecipesQuery(searchQuery)
 
-  //FETCH
-  //busca receitas por query
-  const fetchQueryList = async () => {
-    try {
-      let url = "http://localhost:3001/recipes/query";
-      if (searchQuery) {
-        url += `?search=${searchQuery}`;
-      }
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error("Falha ao buscar receitas");
-      }
-      const data = await response.json();
-      setRecipeList(data);
-    } catch (error) {
-      console.error("Falha ao pesquisar receitas:", error.message);
-    }
-  };
-
+  console.log({ data })
   useEffect(() => {
-    fetchQueryList();
-  });
-
-  //edita uma receita
+    setRecipeList(data)
+  }, [data])
 
   //remove uma receita
   const removeRecipe = async (recipe) => {
@@ -47,7 +31,6 @@ export function Recipes({ totalPrice, searchQuery }) {
         if (!response.ok) {
           throw new Error("Falha ao excluir a receita");
         }
-        fetchQueryList();
         console.log("Receita excluída com sucesso!");
       } catch (error) {
         console.error("Falha ao excluir a receita: ", error.message);
@@ -55,10 +38,12 @@ export function Recipes({ totalPrice, searchQuery }) {
     }
   };
 
-  if (!recipeList || recipeList.length === 0) {
+  // TODO - Extract condition
+  if (!recipeList || recipeList.length === 0 || isLoading) {
     return null; // Não há receitas, nada será renderizado
   }
 
+  // TODO- Refactor styles, extract internal component
   return (
     <>
       {recipeList.map((recipe, index) => (
@@ -78,6 +63,7 @@ export function Recipes({ totalPrice, searchQuery }) {
             <h3>{totalPrice}</h3>
           </div>
           <div className="ingredients">
+            {/* Not use index as list key, use descriptive names */}
             {recipe.ingredients.map((ingredient, i) => (
               <Ingredients
                 key={i}
