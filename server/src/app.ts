@@ -1,8 +1,11 @@
 import * as express from "express";
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
+import { getPagination } from "./utils/pagination";
 import { createIngredient } from "./services";
-import { create } from "domain";
+
+// import { createIngredient } from "./services";
+// import { create } from "domain";
 
 const prisma = new PrismaClient();
 
@@ -14,11 +17,55 @@ app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "http://localhost:3000");
   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
   res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
   next();
 });
 
 // REGISTER ROUTES
 //get all recipes and ingredients by query
+// 1st refactor: do not filter queries directly with the language, use the database instead
+// 2nd refactor: use pagination, avoid breaking memory
+// 3rd refactor: Encapsulation
+// app.get("/recipes/query", async function (req: Request, res: Response) {
+//   const searchQuery = String(req.query.search);
+
+//   const page = Number(req.query.page);
+//   const takeQuery = Number(req.query.take) || 10;
+//   const { skip, take } = getPagination(page, takeQuery);
+
+//   const whereCondition = searchQuery
+//     ? {
+//         name: {
+//           contains: searchQuery,
+//         },
+//         ingredients: {
+//           some: {
+//             ingredient: {
+//               name: {
+//                 contains: searchQuery,
+//               },
+//             },
+//           },
+//         },
+//       }
+//     : undefined;
+
+//   const foundRecipes = await prisma.recipe.findMany({
+//     include: {
+//       ingredients: {
+//         include: {
+//           ingredient: true,
+//         },
+//       },
+//     },
+//     where: whereCondition,
+//     skip,
+//     take,
+//   });
+
+//   res.json(foundRecipes);
+// });
+
 app.get("/recipes/query", async function (req: Request, res: Response) {
   const allRecipes = await prisma.recipe.findMany({
     include: {
@@ -73,13 +120,16 @@ app.post("/recipes", async function (req: Request, res: Response) {
     });
     res.json(newRecipe);
   } catch (error) {
+    if (error.code === "P2025") {
+      return res.status(400).json({ error: "Ingrediente não encontrado" });
+    }
+
     console.error("Erro ao criar nova receita: ", error);
-    res.status(500).send("Erro ao criar nova receita");
+    throw error;
   }
 });
 
 //update a recipe
-
 app.put("/recipes/:id", async function (req: Request, res: Response) {
   const id = req.params.id;
   const { name, icon, ingredients } = req.body;
@@ -138,9 +188,8 @@ app.delete("/recipes/:id", async function (req: Request, res: Response) {
   }
 });
 
-/*create new ingredient
 app.get("/ingredients/create", async function (req: Request, res: Response) {
   res.json(createIngredient("uva", 6.83));
-});*/
+});
 
 app.listen(3001);
