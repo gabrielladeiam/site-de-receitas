@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import * as icons from "../../assets";
 
 export function Recipes({ totalPrice, searchQuery }) {
-  const { mutate } = useRemoveRecipeMutation();
+  const { mutate } = useRemoveRecipeMutation(searchQuery);
   const { data: recipeList, isLoading } = useRecipesQuery(searchQuery);
 
   const shouldRender = !recipeList || recipeList.length === 0 || isLoading;
@@ -19,7 +19,7 @@ export function Recipes({ totalPrice, searchQuery }) {
       {recipeList.map((recipe, index) => (
         // Extract this into a Recipe component
         <div key={index} id={recipe.id} className="recipe">
-          <button className="delete" onClick={() => mutate(recipe)}></button>
+          <button className="delete" onClick={() => mutate(recipe)} />
 
           <Link to={`/recipes/${recipe.id}/edit`} state={recipe}>
             <button className="edit"></button>

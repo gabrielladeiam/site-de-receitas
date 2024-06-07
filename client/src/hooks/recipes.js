@@ -33,7 +33,7 @@ export function useRecipesQuery(search) {
 /*
   Recipes mutations
 */
-export function useRemoveRecipeMutation() {
+export function useRemoveRecipeMutation(search) {
   const queryClient = useQueryClient();
 
   async function resolver(recipe) {
@@ -45,13 +45,13 @@ export function useRemoveRecipeMutation() {
       throw new Error("Falha ao excluir a receita");
     }
 
-    return response.json();
+    return await response.json();
   }
 
   return useMutation({
     mutationFn: resolver,
-    onSuccess: () => {
-      queryClient.invalidateQueries("recipes");
+    onSuccess: async () => {
+      await queryClient.invalidateQueries(["recipes", search]);
     },
     onError: (error) => {
       console.error("Falha ao excluir a receita: ", error.message);
