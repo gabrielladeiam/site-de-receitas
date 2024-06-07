@@ -181,10 +181,10 @@ app.delete("/recipes/:id", async function (req: Request, res: Response) {
     await prisma.recipe.delete({
       where: { id: id },
     });
-    res.status(204).send();
+    res.json({ id });
   } catch (error) {
     console.error("Falha ao excluir a receita: ", error.message);
-    res.status(500).json({ error: "Falha ao excluir a receita" });
+    res.json({ error: "Falha ao excluir a receita" }).status(500);
   }
 });
 
