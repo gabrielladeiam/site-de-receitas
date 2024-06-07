@@ -49,7 +49,7 @@ export function useRemoveRecipeMutation() {
   }
 
   return useMutation({
-    queryFn: resolver,
+    mutationFn: resolver,
     onSuccess: () => {
       queryClient.invalidateQueries("recipes");
     },

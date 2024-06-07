@@ -1,12 +1,12 @@
 import "./recipes.styles.css";
 import { Ingredients } from "../Ingredients/Ingredients";
-import { useRecipesQuery, useRemoveRecipeMutation } from "../../hooks/recipes"
+import { useRecipesQuery, useRemoveRecipeMutation } from "../../hooks/recipes";
 import { Link } from "react-router-dom";
 import * as icons from "../../assets";
 
 export function Recipes({ totalPrice, searchQuery }) {
-  const removeRecipeMutation = useRemoveRecipeMutation();
-  const { data: recipeList , isLoading}  = useRecipesQuery(searchQuery);
+  const { mutate } = useRemoveRecipeMutation();
+  const { data: recipeList, isLoading } = useRecipesQuery(searchQuery);
 
   const shouldRender = !recipeList || recipeList.length === 0 || isLoading;
   if (shouldRender) {
@@ -19,10 +19,7 @@ export function Recipes({ totalPrice, searchQuery }) {
       {recipeList.map((recipe, index) => (
         // Extract this into a Recipe component
         <div key={index} id={recipe.id} className="recipe">
-          <button
-            className="delete"
-            onClick={() => removeRecipeMutation(recipe)}
-          ></button>
+          <button className="delete" onClick={() => mutate(recipe)}></button>
 
           <Link to={`/recipes/${recipe.id}/edit`} state={recipe}>
             <button className="edit"></button>
@@ -39,6 +36,7 @@ export function Recipes({ totalPrice, searchQuery }) {
           <div className="ingredients">
             {/* Not use index as list key, use descriptive names */}
             {/* Extract this into a ingredient list component */}
+
             {recipe.ingredients.map((ingredient, i) => (
               <Ingredients
                 key={i}
