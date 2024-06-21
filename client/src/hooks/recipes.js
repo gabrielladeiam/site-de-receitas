@@ -5,12 +5,11 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 */
 export function useRecipesQuery(search) {
   const resolver = async () => {
-    let url = "http://localhost:3001/recipes/query";
+    let url = "http://localhost:3001/recipes?page=1&take=10&";
 
     if (search) {
-      url += `?search=${search}`;
+      url += `search=${search}`;
     }
-
     const response = await fetch(url);
 
     if (!response.ok) {

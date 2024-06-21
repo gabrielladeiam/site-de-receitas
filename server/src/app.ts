@@ -1,6 +1,6 @@
 import * as express from "express";
 import { Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
 import { getPagination } from "./utils/pagination";
 import { createIngredient } from "./services";
 
@@ -26,48 +26,33 @@ app.use((req, res, next) => {
 // 1st refactor: do not filter queries directly with the language, use the database instead
 // 2nd refactor: use pagination, avoid breaking memory
 // 3rd refactor: Encapsulation
-// app.get("/recipes/query", async function (req: Request, res: Response) {
-//   const searchQuery = String(req.query.search);
+app.get("/recipes", async function (req: Request, res: Response) {
+  const searchQuery = req.query.search;
 
-//   const page = Number(req.query.page);
-//   const takeQuery = Number(req.query.take) || 10;
-//   const { skip, take } = getPagination(page, takeQuery);
+  const page = Number(req.query.page);
+  const takeQuery = Number(req.query.take) || 10;
+  const { skip, take } = getPagination(page, takeQuery);
 
-//   const whereCondition = searchQuery
-//     ? {
-//         name: {
-//           contains: searchQuery,
-//         },
-//         ingredients: {
-//           some: {
-//             ingredient: {
-//               name: {
-//                 contains: searchQuery,
-//               },
-//             },
-//           },
-//         },
-//       }
-//     : undefined;
+  const whereCondition: Prisma.RecipeWhereInput = searchQuery
+    ? {
+        OR: [
+          { name: { contains: String(searchQuery) } },
+          {
+            ingredients: {
+              some: {
+                ingredient: {
+                  name: {
+                    contains: String(searchQuery),
+                  },
+                },
+              },
+            },
+          },
+        ],
+      }
+    : undefined;
 
-//   const foundRecipes = await prisma.recipe.findMany({
-//     include: {
-//       ingredients: {
-//         include: {
-//           ingredient: true,
-//         },
-//       },
-//     },
-//     where: whereCondition,
-//     skip,
-//     take,
-//   });
-
-//   res.json(foundRecipes);
-// });
-
-app.get("/recipes/query", async function (req: Request, res: Response) {
-  const allRecipes = await prisma.recipe.findMany({
+  const foundRecipes = await prisma.recipe.findMany({
     include: {
       ingredients: {
         include: {
@@ -75,20 +60,12 @@ app.get("/recipes/query", async function (req: Request, res: Response) {
         },
       },
     },
+    where: whereCondition,
+    skip,
+    take,
   });
-  const searchQuery = req.query.search as string;
-  if (!searchQuery) {
-    return res.json(allRecipes);
-  }
-  const filteredRecipes = allRecipes.filter((recipe) => {
-    if (recipe.name.toLowerCase().includes(searchQuery.toLowerCase())) {
-      return true;
-    }
-    return recipe.ingredients.some(({ ingredient }) =>
-      ingredient.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  });
-  res.json(filteredRecipes);
+
+  res.json(foundRecipes);
 });
 
 //get all ingredients
