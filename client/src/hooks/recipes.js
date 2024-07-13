@@ -3,9 +3,9 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 /*
   Recipes queries
 */
-export function useRecipesQuery(search) {
+export function useRecipesQuery(search, page) {
   const resolver = async () => {
-    let url = "http://localhost:3001/recipes?page=1&take=10&";
+    let url = `http://localhost:3001/recipes?page=${page}&take=6&`;
 
     if (search) {
       url += `search=${search}`;
@@ -23,7 +23,7 @@ export function useRecipesQuery(search) {
   };
 
   return useQuery({
-    queryKey: ["recipes", search],
+    queryKey: ["recipes", search, page],
     queryFn: resolver,
     staleTime: 30_000,
   });

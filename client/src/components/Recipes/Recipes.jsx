@@ -3,10 +3,13 @@ import { Ingredients } from "../Ingredients/Ingredients";
 import { useRecipesQuery, useRemoveRecipeMutation } from "../../hooks/recipes";
 import { Link } from "react-router-dom";
 import * as icons from "../../assets";
+import { useState } from "react";
 
 export function Recipes({ totalPrice, searchQuery }) {
-  const { mutate } = useRemoveRecipeMutation(searchQuery);
-  const { data: recipeList, isLoading } = useRecipesQuery(searchQuery);
+  const [page, setPage] = useState(1)
+
+  const { mutate } = useRemoveRecipeMutation(searchQuery, page);
+  const { data: recipeList, isLoading } = useRecipesQuery(searchQuery, page);
 
   const shouldRender = !recipeList || recipeList.length === 0 || isLoading;
   if (shouldRender) {
@@ -49,6 +52,10 @@ export function Recipes({ totalPrice, searchQuery }) {
           </div>
         </div>
       ))}
+      <footer className="page"> 
+        <button onClick={() => setPage(page - 1)}>&lt;</button> 
+        <button onClick={() => setPage(page + 1)}>&gt;</button> 
+        </footer>
     </>
   );
 }
