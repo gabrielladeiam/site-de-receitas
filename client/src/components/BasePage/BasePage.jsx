@@ -4,13 +4,13 @@ import { useState } from "react";
 
 export function BasePage({ children, className }) {
   const [inputValue, setInputValue] = useState("");
-  
+
   return (
     <>
       <div className="all-recipes-search">
         <SearchBar value={inputValue} onChange={setInputValue} />
       </div>
-      
+
       {children}
 
       <div className={className}>

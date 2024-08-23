@@ -51,8 +51,8 @@ app.get("/recipes", async function (req: Request, res: Response) {
         ],
       }
     : undefined;
-
-  const foundRecipes = await prisma.recipe.findMany({
+  
+  const query = {
     include: {
       ingredients: {
         include: {
@@ -62,10 +62,15 @@ app.get("/recipes", async function (req: Request, res: Response) {
     },
     where: whereCondition,
     skip,
-    take,
-  });
+    take,   
+  }
+  
+  const [foundRecipes, total] = await prisma.$transaction([
+    prisma.recipe.findMany(query),
+    prisma.recipe.count({ where: query.where }),
+  ]);
 
-  res.json(foundRecipes);
+  res.json({foundRecipes, total});
 });
 
 //get all ingredients
