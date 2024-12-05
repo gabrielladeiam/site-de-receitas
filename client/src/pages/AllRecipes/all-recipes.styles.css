@@ -8,6 +8,10 @@
   justify-content: space-evenly;
 }
 
+.page-section {
+  display: block !important;
+}
+
 @media (max-width: 850px) {
   .all-recipes-container {
     width: 81vw;

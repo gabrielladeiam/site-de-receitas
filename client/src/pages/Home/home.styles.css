@@ -60,18 +60,22 @@
 /*RECYPE*/
 
 .recype-container {
-  max-width: 800px;
+  max-width: 1900px;
   position: absolute;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(230px, 260px));
+  grid-template-columns: repeat(auto-fill, minmax(50px, 260px));
   justify-content: space-evenly;
-  margin-left: 5vw;
+  margin-left: 4vw;
   top: 255px;
-  width: 62vw;
+  width: 70vw;
   height: auto;
 }
 
 .recype-container button {
+  display: none;
+}
+
+.recype-container footer {
   display: none;
 }
 

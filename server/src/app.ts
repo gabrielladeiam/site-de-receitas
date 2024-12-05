@@ -1,8 +1,11 @@
 import * as express from "express";
 import { Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
+import { getPagination } from "./utils/pagination";
 import { createIngredient } from "./services";
-import { create } from "domain";
+
+// import { createIngredient } from "./services";
+// import { create } from "domain";
 
 const prisma = new PrismaClient();
 
@@ -14,13 +17,42 @@ app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "http://localhost:3000");
   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
   res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
   next();
 });
 
 // REGISTER ROUTES
 //get all recipes and ingredients by query
-app.get("/recipes/query", async function (req: Request, res: Response) {
-  const allRecipes = await prisma.recipe.findMany({
+// 1st refactor: do not filter queries directly with the language, use the database instead
+// 2nd refactor: use pagination, avoid breaking memory
+// 3rd refactor: Encapsulation
+app.get("/recipes", async function (req: Request, res: Response) {
+  const searchQuery = req.query.search;
+
+  const page = Number(req.query.page);
+  const takeQuery = Number(req.query.take) || 10;
+  const { skip, take } = getPagination(page, takeQuery);
+
+  const whereCondition: Prisma.RecipeWhereInput = searchQuery
+    ? {
+        OR: [
+          { name: { contains: String(searchQuery) } },
+          {
+            ingredients: {
+              some: {
+                ingredient: {
+                  name: {
+                    contains: String(searchQuery),
+                  },
+                },
+              },
+            },
+          },
+        ],
+      }
+    : undefined;
+  
+  const query = {
     include: {
       ingredients: {
         include: {
@@ -28,20 +60,17 @@ app.get("/recipes/query", async function (req: Request, res: Response) {
         },
       },
     },
-  });
-  const searchQuery = req.query.search as string;
-  if (!searchQuery) {
-    return res.json(allRecipes);
+    where: whereCondition,
+    skip,
+    take,   
   }
-  const filteredRecipes = allRecipes.filter((recipe) => {
-    if (recipe.name.toLowerCase().includes(searchQuery.toLowerCase())) {
-      return true;
-    }
-    return recipe.ingredients.some(({ ingredient }) =>
-      ingredient.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  });
-  res.json(filteredRecipes);
+  
+  const [foundRecipes, total] = await prisma.$transaction([
+    prisma.recipe.findMany(query),
+    prisma.recipe.count({ where: query.where }),
+  ]);
+
+  res.json({foundRecipes, total});
 });
 
 //get all ingredients
@@ -73,13 +102,16 @@ app.post("/recipes", async function (req: Request, res: Response) {
     });
     res.json(newRecipe);
   } catch (error) {
+    if (error.code === "P2025") {
+      return res.status(400).json({ error: "Ingrediente não encontrado" });
+    }
+
     console.error("Erro ao criar nova receita: ", error);
-    res.status(500).send("Erro ao criar nova receita");
+    throw error;
   }
 });
 
 //update a recipe
-
 app.put("/recipes/:id", async function (req: Request, res: Response) {
   const id = req.params.id;
   const { name, icon, ingredients } = req.body;
@@ -131,16 +163,15 @@ app.delete("/recipes/:id", async function (req: Request, res: Response) {
     await prisma.recipe.delete({
       where: { id: id },
     });
-    res.status(204).send();
+    res.json({ id });
   } catch (error) {
     console.error("Falha ao excluir a receita: ", error.message);
-    res.status(500).json({ error: "Falha ao excluir a receita" });
+    res.json({ error: "Falha ao excluir a receita" }).status(500);
   }
 });
 
-/*create new ingredient
 app.get("/ingredients/create", async function (req: Request, res: Response) {
   res.json(createIngredient("uva", 6.83));
-});*/
+});
 
 app.listen(3001);

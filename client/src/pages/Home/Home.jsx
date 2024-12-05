@@ -5,7 +5,7 @@ function HomeBody() {
   return (
     <>
       <span className="span-container">
-        <Links to="/newrecipe" tittle="Add your own recipe"></Links>
+        <Links to="/recipes/create" tittle="Add your own recipe"></Links>
         <p>
           Upload your own home-made recipe, and share it with other members of
           our community
